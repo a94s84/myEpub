@@ -1,0 +1,38 @@
+# 👉 忽略 Python 編譯後的暫存檔案
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 👉 忽略虛擬環境
+.venv/
+venv/
+ENV/
+env/
+
+# 👉 忽略測試用檔案
+test.py
+
+# 👉 忽略編譯產物 / 套件安裝檔案
+build/
+dist/
+*.egg-info/
+
+# 👉 忽略 IDE 設定檔
+.vscode/
+.idea/
+
+# 👉 忽略系統檔案
+.DS_Store
+Thumbs.db
+
+# 👉 忽略環境設定與敏感資訊
+.env
+.env.*
+
+# 👉 忽略 Jupyter Notebook 產生的 checkpoint
+.ipynb_checkpoints/
+
+# 👉 忽略 log / 暫存 / debug 檔案
+*.log
+*.tmp
+*.bak

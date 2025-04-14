@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <title>EPUB 轉換器</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 350px;
+            margin: auto;
+            padding: 2rem 10px;
+            box-sizing: border-box;
+        }
+
+        label {
+            display: block;
+            margin-top: 1rem;
+        }
+
+        input,
+        select,
+        button {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.3rem;
+            line-height: 15px
+        }
+
+        button {
+            margin-top: 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .message {
+            margin-top: 1rem;
+            font-weight: bold;
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .progress-bar-container {
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            height: 20px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #4CAF50;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>📘 半夏 EPUB 轉換器</h1>
+
+    <form id="epubForm" action="/crawl" method="post" enctype="multipart/form-data">
+        <label>
+            網址（小說主頁）：
+            <input type="url" name="url" required placeholder="https://www.banxia.cc/" />
+        </label>
+
+        <label>
+            使用資料方式：
+            <select name="mode" id="modeSelect">
+                <option value="auto">使用網頁預設資料</option>
+                <option value="manual">自行輸入資料</option>
+            </select>
+        </label>
+
+        <div id="manualFields" class="hidden">
+            <label>書名：<input type="text" name="title" placeholder="書名" /></label>
+            <label>作者：<input type="text" name="author" placeholder="作者名稱" /></label>
+            <label>上傳封面：<input type="file" name="cover_image" accept="image/*" /></label>
+        </div>
+
+        <label>
+            傳送方式：
+            <select name="delivery" id="deliveryMethod">
+                <option value="download">📥 EPUB 下載</option>
+                <option value="email">📧 寄送到 Email</option>
+            </select>
+        </label>
+
+        <div id="emailField" class="hidden">
+            <label>接收 Email：<input type="email" name="email" placeholder="you@example.com" /></label>
+        </div>
+
+        <button type="submit">🚀 開始轉換</button>
+
+        <div class="progress-bar-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <p id="status" class="message"></p>
+    </form>
+
+    <script>
+        const form = document.getElementById('epubForm');
+        const modeSelect = document.getElementById('modeSelect');
+        const manualFields = document.getElementById('manualFields');
+        const deliverySelect = document.getElementById('deliveryMethod');
+        const emailField = document.getElementById('emailField');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+        const status = document.getElementById('status');
+
+        modeSelect.addEventListener('change', () => {
+            manualFields.classList.toggle('hidden', modeSelect.value !== 'manual');
+        });
+        deliverySelect.addEventListener('change', () => {
+            emailField.classList.toggle('hidden', deliverySelect.value !== 'email');
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            status.textContent = '';
+            progressBar.style.width = '0%';
+            progressContainer.style.display = 'block';
+
+            let fakeProgress = 0;
+            const interval = setInterval(() => {
+                fakeProgress = Math.min(fakeProgress + Math.random() * 8, 95);
+                progressBar.style.width = fakeProgress + '%';
+            }, 2000);
+
+            const formData = new FormData(form);
+
+            try {
+                const res = await fetch("/crawl", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await res.json();
+
+                clearInterval(interval);
+                progressBar.style.width = '100%';
+
+                const contentType = res.headers.get("Content-Type");
+                if (data.filename) {
+                    window.location.href = `/download?filename=${encodeURIComponent(data.filename)}`
+                    status.textContent = "✅ 下載成功！";
+                } else {
+                    const html = await res.text();
+                    const temp = document.createElement("div");
+                    temp.innerHTML = html;
+                    const message = temp.querySelector(".message")?.textContent || "❌ 未知錯誤";
+                    status.innerHTML = `<span class="error">${message}</span>`;
+                }
+
+                form.reset();
+                manualFields.classList.add("hidden");
+                emailField.classList.add("hidden");
+
+            } catch (err) {
+                clearInterval(interval);
+                status.innerHTML = `<span class="error">❌ 發生錯誤：${err.message}</span>`;
+            } finally {
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    progressBar.style.width = '0%';
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+
+</html>
