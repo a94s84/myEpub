@@ -13,7 +13,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-DEFAULT_EMAIL = "you@example.com"
+DEFAULT_EMAIL = os.getenv("EMAIL_USER")
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
@@ -36,10 +36,7 @@ async def crawl(
         cover_path = os.path.join("static", f"{uuid.uuid4()}_{cover_image.filename}")
         with open(cover_path, "wb") as f:
             shutil.copyfileobj(cover_image.file, f)
-
-    # 檔名預設為書名或 UUID
-    safe_name = title or f"book_{uuid.uuid4().hex[:8]}"
-
+        
     try:
         output_file = generate_epub(
             entry_url=url,
@@ -58,7 +55,7 @@ async def crawl(
                 os.remove(cover_path)
             return templates.TemplateResponse("index.html", {
                 "request": request,
-                "message": f"✅ 已寄出 EPUB 給 {email or DEFAULT_EMAIL}"
+                "message": f"已寄出 EPUB 給 {email or DEFAULT_EMAIL}"
             })
 
         # 檔案下載
@@ -71,7 +68,7 @@ async def crawl(
             os.remove(cover_path)
         return templates.TemplateResponse("index.html", {
             "request": request,
-            "message": f"❌ 發生錯誤：{e}"
+            "message": f"發生錯誤：{e}"
         })
     
 @app.get("/download")

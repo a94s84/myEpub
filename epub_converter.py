@@ -93,7 +93,6 @@ def generate_epub(entry_url, mode="auto", custom_title="", custom_author="", cus
         intro_data["author"] = custom_author or intro_data.get("author")
         intro_data["cover_url"] = custom_cover_path or intro_data.get("cover_url")
 
-    # 使用 intro_data 中的欄位
     title = intro_data.get("title")
     author = intro_data.get("author")
     description_html = intro_data.get("description_html", "")
@@ -108,11 +107,11 @@ def generate_epub(entry_url, mode="auto", custom_title="", custom_author="", cus
     book.set_language('zh')
     book.add_author(author)
 
-    # # 封面處理
+    # 封面處理
     cover_data = requests.get(cover_url).content
     book.set_cover("cover.jpg",cover_data)
 
-    # # 作品簡介頁
+    # 作品簡介頁
     intro_chapter = epub.EpubHtml(title="作品簡介", file_name="intro.xhtml", lang="zh")
     intro_chapter.content = f"""
         <h1>{title}</h1>
@@ -125,14 +124,11 @@ def generate_epub(entry_url, mode="auto", custom_title="", custom_author="", cus
     for ch in chapters:
         book.add_item(ch)
 
-    # toc 不加入 nav 頁
     book.toc = [epub.Link(ch.file_name, ch.title, f"chap{idx}") for idx, ch in enumerate(chapters, 1)]
     book.spine = ['nav', intro_chapter] + chapters
 
     book.add_item(epub.EpubNcx())
-    # ❌ 不加入目錄頁
-    # book.add_item(epub.EpubNav())
-
+   
     epub.write_epub(output_filename, book)
     print(f"🎉 EPUB 檔案已完成：{output_filename}")
     return output_filename
