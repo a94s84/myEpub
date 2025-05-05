@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.epub
+*.txt
 
 # 👉 忽略虛擬環境
 .venv/

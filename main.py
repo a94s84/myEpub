@@ -83,3 +83,8 @@ async def download_epub(filename: str = Query(...)):
         f"attachment; filename={encoded_filename}; filename*=UTF-8''{encoded_filename}"
     )
     return response
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=10000, reload=False)
