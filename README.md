@@ -1,6 +1,6 @@
 # 半夏小說網EPUB轉換器 
 
-這是一個基於 FastAPI 的線上應用，輸入半夏小說網站(https://www.banxia.cc)連結，一鍵轉換為 EPUB 檔案，並選擇下載或寄送至 Email。
+這是一個基於 FastAPI 的線上應用，輸入半夏小說網站 (https://www.banxia.cc/) 連結，一鍵轉換為 EPUB 檔案，並選擇下載或寄送至 Email。
 
 👉 [線上試用](https://myepub-2.onrender.com/)
 
