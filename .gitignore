@@ -4,6 +4,8 @@ __pycache__/
 *$py.class
 *.epub
 *.txt
+!requirements.txt
+
 
 # 👉 忽略虛擬環境
 .venv/
