@@ -6,4 +6,4 @@ ebooklib
 jinja2
 python-dotenv
 python-multipart
-
+cloudscraper
