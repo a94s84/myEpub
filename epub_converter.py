@@ -8,7 +8,10 @@ from ebooklib import epub
 
 
 def fetch_intro_page(base_url):
-    response = requests.get(base_url)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/119 Safari/537.36"
+    }
+    response = requests.get(base_url, headers=headers)
     response.encoding = 'utf-8'
     soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -97,7 +100,7 @@ def generate_epub(entry_url, mode="auto", custom_title="", custom_author="", cus
     author = intro_data.get("author")
     description_html = intro_data.get("description_html", "")
     first_chapter_url = intro_data.get("first_chapter_url", "")
-    cover_url = intro_data.get("cover_url")
+    cover_url = intro_data.get("cover_url", "")
 
     output_filename = f"{title}.epub"
 
@@ -108,8 +111,9 @@ def generate_epub(entry_url, mode="auto", custom_title="", custom_author="", cus
     book.add_author(author)
 
     # 封面處理
-    cover_data = requests.get(cover_url).content
-    book.set_cover("cover.jpg",cover_data)
+    if cover_data[cover_url]:
+        cover_data = requests.get(cover_url).content
+        book.set_cover("cover.jpg",cover_data)
 
     # 作品簡介頁
     intro_chapter = epub.EpubHtml(title="作品簡介", file_name="intro.xhtml", lang="zh")
