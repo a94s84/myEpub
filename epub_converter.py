@@ -111,7 +111,7 @@ def generate_epub(entry_url, mode="auto", custom_title="", custom_author="", cus
     book.add_author(author)
 
     # 封面處理
-    if cover_data[cover_url]:
+    if cover_url:
         cover_data = requests.get(cover_url).content
         book.set_cover("cover.jpg",cover_data)
 
